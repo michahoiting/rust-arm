@@ -1,6 +1,7 @@
 PROJECT=test
 TARGET=thumbv7em-none-eabi
-OUTDIR=target/$(TARGET)/debug
+MODE?=debug
+OUTDIR=target/$(TARGET)/$(MODE)
 HEX=$(OUTDIR)/$(PROJECT).hex
 ELF=$(OUTDIR)/$(PROJECT)
 
@@ -10,9 +11,13 @@ $(HEX): $(ELF)
 	arm-none-eabi-objcopy -R .stack -O ihex $(ELF) $(HEX)
 
 .PHONY: $(ELF)
-$(ELF): 
-	cargo build --target $(TARGET)
+$(ELF):
+ifeq ($(MODE),release)
+	~/.cargo/bin/xargo build --target $(TARGET) --release
+else
+	~/.cargo/bin/xargo build --target $(TARGET)
+endif
 
 flash: $(HEX)
 	@echo "Reset your Teensy now!"
-	teensy-loader-cli -w --mcu=mk20dx256 $(HEX)
+	teensy-loader-cli -w -mmcu=mk20dx128 $(HEX) -v

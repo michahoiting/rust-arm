@@ -29,32 +29,6 @@ int32_t			periph_clk_khz;
 
 extern void main();
 
-/*
- *  start()      initial entry point from the C run-time routine (crt0.s)
- *
- *  This is the entry point following reset and low-level initialzation.
- *  This routine is responsible for system initialization and for
- *  invoking main().
- *
- *  In the original Freescale Code Warrior example code, this routine
- *  lived in start.c.  I've moved it here so that a custom Teensy 3.1
- *  project can consist of just three files; crt0.s, the main project
- *  file, and this file.   8 Apr 14  KEL
- */
-void start(void)
-{
-/*
- * Enable all of the port clocks. These have to be enabled to configure
- * pin muxing options, so most code will need all of these on anyway.
- */
-	sysinit();			// Perform processor initialization
-	main();				// run the main program
-
-	while (1)   ;		// control should never get here!
-}
-
-
-
 /********************************************************************/
 void sysinit (void)
 {
@@ -345,28 +319,3 @@ int32_t  pll_init(int8_t  prdiv_val, int8_t  vdiv_val)
  */
 	return ((crystal_val / prdiv) * vdiv); //MCGOUT equals PLL output frequency
 } // pll_init
-
-
-
-/********************************************************************
- *
- *  Watchdog timer disable routine
- *
- *  This routine was modified from the original in a Freescale Code
- *  Warrior example set.  The original code was contained in a source
- *  file named wdog.c.  That code disabled interrupts prior to unlocking
- *  the watchdog.  Unfortunately, that code also blindly reenabled
- *  interrupts without regard to their state prior to entry.
- *
- *  This code assumes that the calling routine will disable interrupts
- *  prior to the call, if necessary.  8 Apr 14   KEL
- *
- * Parameters:  none
- *
- */
-void wdog_disable(void)
-{
-	WDOG_UNLOCK = 0xC520;			// Write 0xC520 to the unlock register
-	WDOG_UNLOCK = 0xD928;			// Followed by 0xD928 to complete the unlock
-	WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;	// Clear the WDOGEN bit to disable the watchdog
-}
