@@ -1,8 +1,10 @@
-#![feature(lang_items,start,core_intrinsics)]
+#![feature(lang_items,start,core_intrinsics,compiler_builtins_lib)]
 #![no_std]
 #![no_main]    
 
-use core::fmt;
+extern crate compiler_builtins;
+
+use core::fmt; 
 
 mod ports;
 use ports::*;
